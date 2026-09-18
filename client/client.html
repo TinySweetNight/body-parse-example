@@ -28,8 +28,39 @@
       
     };
 
-    const sendPost = (nameForm) => {
+    const obj = await response.json();
+    if(obj.message){
+      content.innerHTML += `<p>${obj.message}</p>`;
 
+
+    }
+
+    const sendPost = async (nameForm) => {
+      const url = nameForm.getAttribute("action"); //"/Add user"
+      const method = nameForm.getAttribute("method"); //post
+
+      const name = nameForm.querySelector("#nameField").value;
+      const age = nameForm.querySelector("ageField").value;
+
+      const dataType = nameForm.querySelector("#dataType");
+
+       let formData = `name=${name}&age=${age}`;
+
+      if (dataType === 'application/json'){
+        formData = JSON.stringify({name, age});
+      }
+
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': dataType,
+          'Accept': 'application/json'
+        },
+        body:formData
+      });
+
+      handleResponse(response);
     };
 
     const init = () => {
@@ -56,6 +87,10 @@
       <input id="nameField" type="text" name="name" />
       <label for="age">Age: </label>
       <input id="ageField" type="number" name="age" min="0" max="100" step="1"/>
+      <select name="dataType" id="dataType">
+        <option value="application/x-www-form-urlencoded">Url Encoded</option>
+        <option value="application/json">JSON</option>
+      </select>
       <input type="submit" value="Add User" />
     </form>
     <p>Go to <a href="/getUsers">/getUsers</a> to see users.</p>

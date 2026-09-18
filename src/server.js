@@ -22,6 +22,29 @@ const parseBody = (request, response, handler) => {
     const bodyString = Buffer.concat(body).toString();
     console.log(bodyString);
   })
+
+
+
+  request.on('end', () => {
+    const bodyString = Buffer.concat(body).toString();
+
+    const type = request.header['content-type'];
+
+    if(type === 'application/x-www-fomr-urlencoded'){
+
+        request.body = query.parse(bodyString);
+
+    }else if( type === 'application/json'){
+      request.body = JSON.parse(bodyString);
+
+    } else{
+      response.writeHead(400, {'Content-Type' : 'application/json'});
+    }
+
+
+
+    handler(request, response);
+  })
 }
 const handlePost = (request, response, parsedUrl) => {
   if(parsedUrl === '/addUser'){
